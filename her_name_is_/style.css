@@ -58,9 +58,10 @@ button {
 }
 
 .hero-image {
+  display: block;
   width: 100%;
-  aspect-ratio: 16 / 7;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   background: #e9e0d1;
 }
 
