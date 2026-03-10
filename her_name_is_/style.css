@@ -61,8 +61,6 @@ button {
   display: block;
   width: 100%;
   height: auto;
-  object-fit: contain;
-  background: #e9e0d1;
 }
 
 .hero-title {
