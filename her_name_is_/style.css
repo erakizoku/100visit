@@ -244,3 +244,68 @@ button {
     font-size: 1.7rem;
   }
 }
+.hidden {
+  display: none !important;
+}
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+}
+
+.popup-box {
+  width: 100%;
+  max-width: 320px;
+  background: #fbf6ee;
+  border: 1px solid #a99b84;
+  border-radius: 6px;
+  padding: 20px 16px 16px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.popup-box.glitch {
+  animation: popupShake 0.25s linear 2;
+  border-color: #7d1f1f;
+}
+
+.popup-message {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #2f2a24;
+}
+
+.popup-close-button {
+  min-width: 100px;
+  padding: 8px 16px;
+  border: 1px solid #a99b84;
+  background: #f4efe6;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  color: #2f2a24;
+}
+
+.popup-close-button:hover {
+  background: #f0e8db;
+}
+
+.counter-display.is-100 span {
+  background: #f7efe8;
+  border-color: #9f7b7b;
+}
+
+@keyframes popupShake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
