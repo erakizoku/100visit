@@ -15,7 +15,6 @@
           alt="Mの研究室 バナー"
           class="hero-image"
         />
-        <h1 class="hero-title"></h1>
       </div>
     </header>
 
@@ -26,17 +25,28 @@
       </p>
     </section>
 
-    <section class="counter-section box">
+    <section class="counter-section box" id="counterSection">
       <h2 class="section-title section-title-blue">訪問者数</h2>
 
-      <div class="counter-display" aria-label="訪問者数 99">
+      <div
+        class="counter-display"
+        id="visitorCounter"
+        aria-label="訪問者数 99"
+      >
         <span>0</span>
         <span>0</span>
         <span>9</span>
         <span>9</span>
       </div>
 
-      <button type="button" class="update-button">更新</button>
+      <button
+        type="button"
+        class="update-button"
+        id="updateButton"
+        aria-label="訪問者数を更新"
+      >
+        更新
+      </button>
 
       <p class="counter-note">
         100人までもう少し！<br />
@@ -79,6 +89,20 @@
       </div>
     </section>
   </main>
+
+  <!-- ポップアップ -->
+  <div id="popupOverlay" class="popup-overlay hidden" aria-hidden="true">
+    <div class="popup-box" id="popupBox" role="dialog" aria-modal="true" aria-labelledby="popupMessage">
+      <p id="popupMessage" class="popup-message">
+        おめでとうございます！<br />
+        あなたは100人目の訪問者です！
+      </p>
+      <button type="button" id="popupCloseButton" class="popup-close-button">
+        閉じる
+      </button>
+    </div>
+  </div>
+
   <script src="./script.js"></script>
 </body>
 </html>
