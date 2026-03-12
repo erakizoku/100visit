@@ -1,31 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
   const visitorCounter = document.getElementById("visitorCounter");
   const updateButton = document.getElementById("updateButton");
-  const popupOverlay = document.getElementById("popupOverlay");
-  const popupBox = document.getElementById("popupBox");
-  const popupMessage = document.getElementById("popupMessage");
-  const popupCloseButton = document.getElementById("popupCloseButton");
 
-  if (
-    !visitorCounter ||
-    !updateButton ||
-    !popupOverlay ||
-    !popupBox ||
-    !popupMessage ||
-    !popupCloseButton
-  ) {
-    console.error("必要なHTML要素が見つかりません。id指定を確認してください。");
+  if (!visitorCounter || !updateButton) {
+    console.error("必要なHTML要素が見つかりません。");
     return;
   }
 
   const counterDigits = visitorCounter.querySelectorAll("span");
-  let hasReached100 = false;
-  let ominousMessageTimer = null;
+  let hasStarted = false;
 
-  /**
-   * カウンター表示を更新する
-   * 例: 99 -> 0099
-   */
   function setCounter(value) {
     const padded = String(value).padStart(counterDigits.length, "0");
     const chars = padded.split("");
@@ -37,74 +21,139 @@ document.addEventListener("DOMContentLoaded", () => {
     visitorCounter.setAttribute("aria-label", `訪問者数 ${value}`);
   }
 
-  /**
-   * ポップアップを開く
-   */
-  function openPopup(messageHtml, withGlitch = false) {
-    popupMessage.innerHTML = messageHtml;
-    popupOverlay.classList.remove("hidden");
-    popupOverlay.setAttribute("aria-hidden", "false");
-
-    if (withGlitch) {
-      popupBox.classList.add("glitch");
-      setTimeout(() => {
-        popupBox.classList.remove("glitch");
-      }, 500);
-    }
+  function createOverlay(extraClass = "") {
+    const overlay = document.createElement("div");
+    overlay.className = `popup-overlay ${extraClass}`.trim();
+    document.body.appendChild(overlay);
+    return overlay;
   }
 
-  /**
-   * ポップアップを閉じる
-   */
-  function closePopup() {
-    popupOverlay.classList.add("hidden");
-    popupOverlay.setAttribute("aria-hidden", "true");
+  function wait(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
 
-  /**
-   * 100人目演出開始
-   */
-  function start100VisitorSequence() {
-    if (hasReached100) {
+  function showWordArtPopup() {
+    return new Promise((resolve) => {
+      const overlay = createOverlay("tap-anywhere");
+
+      const popup = document.createElement("div");
+      popup.className = "wordart-popup";
+
+      popup.innerHTML = `
+        <p class="wordart-title">おめでとうございます！</p>
+        <p class="wordart-subtitle">100人目の訪問者です。</p>
+      `;
+
+      overlay.appendChild(popup);
+
+      const close = () => {
+        overlay.remove();
+        resolve();
+      };
+
+      overlay.addEventListener("click", close, { once: true });
+    });
+  }
+
+  function showSystemPopup() {
+    return new Promise((resolve) => {
+      const overlay = createOverlay();
+
+      const popup = document.createElement("div");
+      popup.className = "system-popup";
+
+      popup.innerHTML = `
+        <div class="system-popup-header">System</div>
+        <div class="system-popup-body">
+          <p class="system-popup-message">生体転移プログラムを実行しますか？</p>
+          <div class="system-popup-buttons">
+            <button type="button" class="system-popup-button" data-next="yes-ja">はい</button>
+            <button type="button" class="system-popup-button" data-next="yes-en">YES</button>
+          </div>
+        </div>
+      `;
+
+      overlay.appendChild(popup);
+
+      popup.querySelectorAll(".system-popup-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          overlay.remove();
+          resolve();
+        });
+      });
+    });
+  }
+
+  function showProgressPopup() {
+    return new Promise((resolve) => {
+      const overlay = createOverlay();
+
+      const popup = document.createElement("div");
+      popup.className = "progress-popup";
+
+      popup.innerHTML = `
+        <div class="progress-popup-header">System</div>
+        <div class="progress-popup-body">
+          <p class="progress-popup-message">生体データを読み込み中</p>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+          </div>
+          <div class="progress-percent" id="progressPercent">0%</div>
+        </div>
+      `;
+
+      overlay.appendChild(popup);
+
+      const fill = popup.querySelector("#progressBarFill");
+      const percent = popup.querySelector("#progressPercent");
+
+      const duration = 3000; // 3秒
+      const startTime = performance.now();
+
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const progressPercent = Math.floor(progress * 100);
+
+        fill.style.width = `${progress * 100}%`;
+        percent.textContent = `${progressPercent}%`;
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setTimeout(() => {
+            overlay.remove();
+            resolve();
+          }, 200);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    });
+  }
+
+  async function startSequence() {
+    if (hasStarted) {
       return;
     }
 
-    hasReached100 = true;
+    hasStarted = true;
     updateButton.disabled = true;
 
-    // 少し間を置いてから100にする
-    setTimeout(() => {
-      setCounter(100);
-      visitorCounter.classList.add("is-100");
+    await wait(300);
+    setCounter(100);
+    visitorCounter.classList.add("is-100");
 
-      openPopup("おめでとうございます！<br>あなたは100人目の訪問者です！");
+    await wait(250);
+    await showWordArtPopup();
+    await showSystemPopup();
+    await showProgressPopup();
 
-      ominousMessageTimer = setTimeout(() => {
-        if (!popupOverlay.classList.contains("hidden")) {
-          openPopup(
-            "……100人目を確認しました。<br>このページから離れないでください。",
-            true
-          );
-        }
-      }, 2200);
-    }, 500);
+    // ここから先は後で追加
+    console.log("ここから次の演出を追加できます。");
   }
 
-  updateButton.addEventListener("click", start100VisitorSequence);
-
-  popupCloseButton.addEventListener("click", () => {
-    closePopup();
-  });
-
-  popupOverlay.addEventListener("click", (event) => {
-    if (event.target === popupOverlay) {
-      closePopup();
-    }
-  });
-
-  window.addEventListener("beforeunload", () => {
-    if (ominousMessageTimer) {
-      clearTimeout(ominousMessageTimer);
-    }
-  });
+  updateButton.addEventListener("click", startSequence);
 });
