@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <main class="page">
+  <main class="page" id="mainPage">
     <header class="hero">
       <div class="hero-image-wrap">
         <img
@@ -90,16 +90,26 @@
     </section>
   </main>
 
-  <!-- ポップアップ -->
-  <div id="popupOverlay" class="popup-overlay hidden" aria-hidden="true">
-    <div class="popup-box" id="popupBox" role="dialog" aria-modal="true" aria-labelledby="popupMessage">
-      <p id="popupMessage" class="popup-message">
-        おめでとうございます！<br />
-        あなたは100人目の訪問者です！
-      </p>
-      <button type="button" id="popupCloseButton" class="popup-close-button">
-        閉じる
-      </button>
+  <!-- オーバーレイ演出層 -->
+  <div id="effectLayer" class="effect-layer hidden">
+    <div id="effectMask" class="effect-mask"></div>
+
+    <div id="effectContent" class="effect-content">
+      <!-- ここにJSで各ポップアップ・UIを出す -->
+    </div>
+
+    <div id="girlStage" class="girl-stage hidden">
+      <div class="girl-mask"></div>
+      <img
+        id="sayaImage"
+        class="saya-image"
+        src="../assets/images/saya_standing.png"
+        alt="サヤ"
+      />
+      <div id="dialogWindow" class="dialog-window hidden">
+        <p id="dialogText" class="dialog-text"></p>
+        <p id="dialogHint" class="dialog-hint hidden">タップで次へ</p>
+      </div>
     </div>
   </div>
 
