@@ -247,7 +247,7 @@ effectContent.innerHTML=`
 `;
 
 document.getElementById("lineBtn").onclick=()=>{
-window.open("https://example.com","_blank");
+window.open("https://lin.ee/OAd6OLo","_blank");
 };
 
 }
