@@ -309,3 +309,154 @@ button {
   75% { transform: translateX(-3px); }
   100% { transform: translateX(0); }
 }
+.hidden {
+  display: none !important;
+}
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+}
+
+.popup-overlay.tap-anywhere {
+  cursor: pointer;
+}
+
+.wordart-popup {
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+}
+
+.wordart-title {
+  margin: 0 0 18px;
+  font-family: "メイリオ", Meiryo, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #ffe66d;
+  text-shadow:
+    0 1px 0 #b36b00,
+    0 2px 0 #b36b00,
+    0 3px 0 #b36b00,
+    0 4px 8px rgba(0, 0, 0, 0.35);
+  letter-spacing: 0.03em;
+}
+
+.wordart-subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #ffffff;
+  line-height: 1.8;
+}
+
+.system-popup {
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid #8f8f8f;
+  background: #f3f3f3;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.system-popup-header {
+  padding: 8px 12px;
+  background: linear-gradient(to bottom, #e9e9e9, #d9d9d9);
+  border-bottom: 1px solid #b8b8b8;
+  font-size: 0.92rem;
+  color: #222;
+}
+
+.system-popup-body {
+  padding: 18px 16px 16px;
+  background: #f9f9f9;
+}
+
+.system-popup-message {
+  margin: 0 0 18px;
+  font-size: 1rem;
+  color: #222;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.system-popup-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.system-popup-button {
+  min-width: 88px;
+  padding: 8px 14px;
+  border: 1px solid #888;
+  background: #ffffff;
+  color: #222;
+  border-radius: 3px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.system-popup-button:hover {
+  background: #efefef;
+}
+
+.progress-popup {
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid #8f8f8f;
+  background: #f3f3f3;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-popup-header {
+  padding: 8px 12px;
+  background: linear-gradient(to bottom, #e9e9e9, #d9d9d9);
+  border-bottom: 1px solid #b8b8b8;
+  font-size: 0.92rem;
+  color: #222;
+}
+
+.progress-popup-body {
+  padding: 18px 16px 18px;
+  background: #f9f9f9;
+}
+
+.progress-popup-message {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  color: #222;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 18px;
+  border: 1px solid #999;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(to right, #66a3ff, #2d69d7);
+  transition: width 0.03s linear;
+}
+
+.progress-percent {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 0.95rem;
+  color: #222;
+}
