@@ -1,10 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  /*
-    ここに各設問の正解を入れてください
-    ひらがな想定
-    例:
-    const answers = ["さや", "こうえん", "ちゅーりっぷ", "ありがとう"];
-  */
   const answers = [
     "こたえ1",
     "こたえ2",
@@ -14,16 +8,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const programBoxes = document.querySelectorAll(".program-box");
 
+  console.log("programBoxes:", programBoxes.length);
+
   if (!programBoxes.length) {
-    console.error("program-box が見つかりません。HTML構造を確認してください。");
+    console.error("program-box が見つかりません。HTMLの class を確認してください。");
     return;
   }
 
   injectPopupStyles();
 
   programBoxes.forEach((box, index) => {
-    const input = box.querySelector(".answer-input");
-    const button = box.querySelector(".answer-button");
+    const input = box.querySelector("input");
+    const button = box.querySelector("button");
+
+    console.log(`program ${index + 1}`, { input, button });
 
     if (!input || !button) {
       console.warn(`program-box ${index + 1} に input または button が見つかりません。`);
@@ -31,6 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     button.addEventListener("click", async () => {
+      console.log(`button clicked: ${index + 1}`);
+
       const userInput = normalizeAnswer(input.value);
       const correctAnswer = normalizeAnswer(answers[index] || "");
       const programNumber = index + 1;
@@ -46,18 +46,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const isCorrect = userInput === correctAnswer;
 
       try {
-        if (isCorrect) {
-          await runProgramSequence(programNumber, true);
-        } else {
-          await runProgramSequence(programNumber, false);
-        }
+        await runProgramSequence(programNumber, isCorrect);
+      } catch (error) {
+        console.error(error);
+        alert("エラーが発生しました。console を確認してください。");
       } finally {
         button.disabled = false;
         input.disabled = false;
       }
     });
 
-    input.addEventListener("keydown", async (event) => {
+    input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
         button.click();
@@ -221,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const percent = overlay.querySelector("#programProgressPercent");
 
       const targetPercent = isCorrect ? 100 : 50;
-      const duration = isCorrect ? 900 : 600; // 早め
+      const duration = isCorrect ? 900 : 600;
       const startTime = performance.now();
 
       function animate(now) {
