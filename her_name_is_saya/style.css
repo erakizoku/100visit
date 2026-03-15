@@ -1,143 +1,189 @@
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>her name is Saya</title>
-
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-
-<body>
-
-
-<div class="container">
-
-
-<h1 class="site-title">her name is Saya</h1>
-
-
-<!-- サヤプロフィール -->
-
-<section class="profile">
-
-<div class="profile-image">
-
-<img src="../assets/images/saya_bust.png">
-
-</div>
-
-
-<div class="profile-info">
-
-<p><b>Name:</b> Saya Endo</p>
-<p><b>Birth date:</b> 03/27/2010</p>
-<p><b>Blood type:</b> B</p>
-
-</div>
-
-</section>
-
-
-<hr>
-
-
-
-<!-- 解放プログラム1 -->
-
-<section class="program">
-
-<h2>解放プログラム 1</h2>
-
-<div class="question-image">
-
-<img src="../assets/images/question1.png">
-
-</div>
-
-<input type="text" maxlength="10">
-
-<button>回答する</button>
-
-<p class="note">※ひらがなで記載してください</p>
-
-</section>
-
-
-
-<!-- 解放プログラム2 -->
-
-<section class="program">
-
-<h2>解放プログラム 2</h2>
-
-<div class="question-image">
-
-<img src="../assets/images/question2.png">
-
-</div>
-
-<input type="text" maxlength="10">
-
-<button>回答する</button>
-
-<p class="note">※ひらがなで記載してください</p>
-
-</section>
-
-
-
-<!-- 解放プログラム3 -->
-
-<section class="program">
-
-<h2>解放プログラム 3</h2>
-
-<div class="question-image">
-
-<img src="../assets/images/question3.png">
-
-</div>
-
-<input type="text" maxlength="10">
-
-<button>回答する</button>
-
-<p class="note">※ひらがなで記載してください</p>
-
-</section>
-
-
-
-<!-- 解放プログラム4 -->
-
-<section class="program">
-
-<h2>解放プログラム 4</h2>
-
-<div class="question-image">
-
-<img src="../assets/images/question4.png">
-
-</div>
-
-<input type="text" maxlength="10">
-
-<button>回答する</button>
-
-<p class="note">※ひらがなで記載してください</p>
-
-</section>
-
-
-</div>
-
-
-</body>
-
-</html>
+@charset "UTF-8";
+
+:root {
+  --bg: #f7f1e6;
+  --paper: rgba(255, 250, 242, 0.58);
+  --line: #cbbda7;
+  --line-soft: #ddd1bc;
+  --text: #2f2a24;
+  --blue-header: #dbe7f2;
+  --button-bg: #f4efe6;
+  --button-border: #a99b84;
+  --input-bg: #faf7f1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "メイリオ", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.page {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 18px 14px 32px;
+}
+
+/* ===== プロフィール ===== */
+
+.profile-box {
+  margin-bottom: 24px;
+  padding: 18px 16px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.profile-image-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.profile-image {
+  width: 160px;
+  max-width: 100%;
+  filter: grayscale(100%);
+  border: 1px solid var(--line);
+  background: #ebe4d7;
+}
+
+.profile-info {
+  text-align: center;
+}
+
+.profile-info p {
+  margin: 8px 0;
+  font-size: 1rem;
+}
+
+.label {
+  font-weight: 700;
+}
+
+/* ===== プログラム ===== */
+
+.program-box {
+  margin-bottom: 22px;
+  padding: 18px 16px 16px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  text-align: center;
+}
+
+.program-title {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  background: var(--blue-header);
+  border: 1px solid var(--line-soft);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.question-image-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.question-image {
+  width: 100%;
+  max-width: 260px;
+  border: 1px solid var(--line);
+  background: #f5f0e7;
+}
+
+.answer-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.answer-input {
+  width: 190px;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--button-border);
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 16px;
+}
+
+.answer-input::placeholder {
+  color: #9a8f7c;
+}
+
+.answer-button {
+  padding: 10px 16px;
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.answer-button:hover {
+  background: #f0e8db;
+}
+
+.note {
+  margin: 0;
+  font-size: 12px;
+  color: #6f6658;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ===== スマホ最適化 ===== */
+
+@media (max-width: 380px) {
+  .page {
+    padding: 16px 12px 28px;
+  }
+
+  .program-title {
+    font-size: 1.25rem;
+  }
+
+  .answer-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .answer-input {
+    width: 100%;
+  }
+
+  .answer-button {
+    width: 100%;
+  }
+
+  .profile-image {
+    width: 140px;
+  }
+}
