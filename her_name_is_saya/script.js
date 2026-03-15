@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
+  /*
+    各設問の正解を入れてください
+    ひらがな想定
+  */
   const answers = [
     "こたえ1",
     "こたえ2",
@@ -7,8 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const programBoxes = document.querySelectorAll(".program-box");
-
-  console.log("programBoxes:", programBoxes.length);
+  const profileImage = document.querySelector(".profile-image");
 
   if (!programBoxes.length) {
     console.error("program-box が見つかりません。HTMLの class を確認してください。");
@@ -17,19 +20,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   injectPopupStyles();
 
+  const solvedState = new Array(programBoxes.length).fill(false);
+
+  updateSayaColor();
+
   programBoxes.forEach((box, index) => {
     const input = box.querySelector("input");
     const button = box.querySelector("button");
+    const title = box.querySelector(".program-title");
 
-    console.log(`program ${index + 1}`, { input, button });
-
-    if (!input || !button) {
-      console.warn(`program-box ${index + 1} に input または button が見つかりません。`);
+    if (!input || !button || !title) {
+      console.warn(`program-box ${index + 1} に必要な要素が見つかりません。`);
       return;
     }
 
     button.addEventListener("click", async () => {
-      console.log(`button clicked: ${index + 1}`);
+      if (solvedState[index]) {
+        return;
+      }
 
       const userInput = normalizeAnswer(input.value);
       const correctAnswer = normalizeAnswer(answers[index] || "");
@@ -47,10 +55,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         await runProgramSequence(programNumber, isCorrect);
+
+        if (isCorrect) {
+          solvedState[index] = true;
+          markProgramSolved(box, title, input, button, programNumber);
+          updateSayaColor();
+
+          const allSolved = solvedState.every(Boolean);
+          if (allSolved) {
+            await runEndingSequence(answers[3] || "");
+          }
+        } else {
+          button.disabled = false;
+          input.disabled = false;
+        }
       } catch (error) {
         console.error(error);
         alert("エラーが発生しました。console を確認してください。");
-      } finally {
         button.disabled = false;
         input.disabled = false;
       }
@@ -71,6 +92,35 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/[ァ-ヶ]/g, (match) =>
         String.fromCharCode(match.charCodeAt(0) - 0x60)
       );
+  }
+
+  function getSolvedCount() {
+    return solvedState.filter(Boolean).length;
+  }
+
+  function updateSayaColor() {
+    if (!profileImage) return;
+
+    const solvedCount = getSolvedCount();
+
+    // 0問=100%, 1問=75%, 2問=50%, 3問=25%, 4問=0%
+    const grayscaleMap = [100, 75, 50, 25, 0];
+    const gray = grayscaleMap[solvedCount] ?? 100;
+
+    profileImage.style.filter = `grayscale(${gray}%)`;
+    profileImage.style.transition = "filter 0.8s ease";
+  }
+
+  function markProgramSolved(box, title, input, button, programNumber) {
+    title.textContent = `解放プログラム ${programNumber}（完了）`;
+    box.classList.add("program-solved");
+
+    input.disabled = true;
+    button.disabled = true;
+    input.classList.add("is-solved");
+    button.classList.add("is-solved");
+
+    button.textContent = "完了";
   }
 
   function injectPopupStyles() {
@@ -117,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
         color: #222;
         line-height: 1.7;
         text-align: left;
+        white-space: pre-wrap;
       }
 
       .program-progress-track {
@@ -160,6 +211,19 @@ document.addEventListener("DOMContentLoaded", () => {
       .program-message-button:hover {
         background: #efefef;
       }
+
+      .program-solved {
+        background: rgba(255, 252, 245, 0.85) !important;
+        border-color: #bcae97 !important;
+      }
+
+      .program-solved .program-title {
+        background: #e7f0da !important;
+      }
+
+      .is-solved {
+        opacity: 0.9;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -171,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return overlay;
   }
 
-  function showMessagePopup(message) {
+  function showMessagePopup(message, buttonLabel = "OK") {
     return new Promise((resolve) => {
       const overlay = createOverlay();
 
@@ -181,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="program-popup-body">
             <p class="program-popup-message">${escapeHtml(message)}</p>
             <div class="program-message-button-row">
-              <button type="button" class="program-message-button">OK</button>
+              <button type="button" class="program-message-button">${escapeHtml(buttonLabel)}</button>
             </div>
           </div>
         </div>
@@ -254,6 +318,63 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       await showMessagePopup("認証が失敗しました");
     }
+  }
+
+  async function runEndingSequence(program4Answer) {
+    await showMessagePopup("全ての解放プログラムが完了しました");
+
+    await showMessagePopup("対象の接続制限を解除しています");
+
+    await runFinalProgressPopup();
+
+    await showMessagePopup(
+      `Saya の解放が完了しました。\n解放プログラム4の答えをLINEで送ってください。`
+    );
+  }
+
+  function runFinalProgressPopup() {
+    return new Promise((resolve) => {
+      const overlay = createOverlay();
+
+      overlay.innerHTML = `
+        <div class="program-popup">
+          <div class="program-popup-header">System</div>
+          <div class="program-popup-body">
+            <p class="program-popup-message">最終解放シーケンスを実行中</p>
+            <div class="program-progress-track">
+              <div class="program-progress-fill" id="finalProgressFill"></div>
+            </div>
+            <div class="program-progress-percent" id="finalProgressPercent">0%</div>
+          </div>
+        </div>
+      `;
+
+      const fill = overlay.querySelector("#finalProgressFill");
+      const percent = overlay.querySelector("#finalProgressPercent");
+      const duration = 1800;
+      const startTime = performance.now();
+
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const currentPercent = Math.floor(progress * 100);
+
+        fill.style.width = `${currentPercent}%`;
+        percent.textContent = `${currentPercent}%`;
+
+        if (currentPercent >= 100) {
+          setTimeout(() => {
+            overlay.remove();
+            resolve();
+          }, 250);
+          return;
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      requestAnimationFrame(animate);
+    });
   }
 
   function escapeHtml(text) {
