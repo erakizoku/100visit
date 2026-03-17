@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hospital</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main id="scene" class="scene scene-black">
+    <div id="bgLayerA" class="bg-layer visible"></div>
+    <div id="bgLayerB" class="bg-layer"></div>
+
+    <div id="characterLayer" class="character-layer">
+      <img id="characterImage" class="character-image hidden" src="" alt="" />
+    </div>
+
+    <div id="textBox" class="text-box">
+      <p id="text" class="text"></p>
+      <p id="textHint" class="text-hint">タップで次へ</p>
+      <div id="choices" class="choices"></div>
+    </div>
+  </main>
+
+  <div id="inputOverlay" class="input-overlay hidden">
+    <div class="input-box">
+      <p class="input-title">サヤに声をかける</p>
+      <input id="userInput" class="user-input" maxlength="10" />
+      <p class="input-note">ひらがな10文字以内で記載してください</p>
+      <button id="submitBtn" class="submit-btn" type="button">決定</button>
+    </div>
+  </div>
+
+  <div id="endingOverlay" class="ending-overlay hidden">
+    <div class="ending-big" id="endingBig"></div>
+    <div class="ending-mid" id="endingMid"></div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
