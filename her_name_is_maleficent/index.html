@@ -1,1 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>her_name_is_maleficent</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="page" id="mainPage">
+    <section class="boss-visual box">
+      <div class="boss-visual-stage" id="bossVisualStage">
+        <div class="battle-bg"></div>
 
+        <img
+          id="bossImage"
+          class="boss-image"
+          src="../assets/images/maleficent_human.png"
+          alt="マレフィセント"
+        />
+
+        <div id="effectLayer" class="effect-layer" aria-hidden="true"></div>
+        <div id="flashLayer" class="flash-layer" aria-hidden="true"></div>
+      </div>
+
+      <div class="boss-status">
+        <div class="status-chip" id="phaseChip">Phase 1 / 人型</div>
+        <div class="status-chip" id="progressChip">攻略状況 0 / 4</div>
+      </div>
+    </section>
+
+    <section class="intro-box box">
+      <p>
+        管理者の正体にたどり着いた。<br />
+        サヤと協力して、マレフィセントを倒そう。
+      </p>
+    </section>
+
+    <section class="question-box box">
+      <h2 class="section-title section-title-blue">魔法の解読 1</h2>
+
+      <div class="question-image-wrap">
+        <img
+          src="../assets/images/maleficent_q1.png"
+          alt="question 1"
+          class="question-image"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div class="question-placeholder">ここに問1の問題画像を配置</div>
+      </div>
+
+      <div class="answer-row">
+        <input
+          id="input-q1"
+          type="text"
+          maxlength="10"
+          class="answer-input"
+          placeholder="ここに回答"
+          autocomplete="off"
+        />
+        <button type="button" class="answer-button" data-question="q1">回答する</button>
+      </div>
+
+      <p class="note">※ひらがなで記載してください</p>
+      <p class="solved-label" id="solved-q1">未完了</p>
+    </section>
+
+    <section class="question-box box">
+      <h2 class="section-title section-title-blue">魔法の解読 2</h2>
+
+      <div class="question-image-wrap">
+        <img
+          src="../assets/images/maleficent_q2.png"
+          alt="question 2"
+          class="question-image"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div class="question-placeholder">ここに問2の問題画像を配置</div>
+      </div>
+
+      <div class="answer-row">
+        <input
+          id="input-q2"
+          type="text"
+          maxlength="10"
+          class="answer-input"
+          placeholder="ここに回答"
+          autocomplete="off"
+        />
+        <button type="button" class="answer-button" data-question="q2">回答する</button>
+      </div>
+
+      <p class="note">※ひらがなで記載してください</p>
+      <p class="solved-label" id="solved-q2">未完了</p>
+    </section>
+
+    <section class="question-box box">
+      <h2 class="section-title section-title-blue">魔法の解読 3</h2>
+
+      <div class="question-image-wrap">
+        <img
+          src="../assets/images/maleficent_q3.png"
+          alt="question 3"
+          class="question-image"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div class="question-placeholder">ここに問3の問題画像を配置</div>
+      </div>
+
+      <div class="answer-row">
+        <input
+          id="input-q3"
+          type="text"
+          maxlength="10"
+          class="answer-input"
+          placeholder="ここに回答"
+          autocomplete="off"
+        />
+        <button type="button" class="answer-button" data-question="q3">回答する</button>
+      </div>
+
+      <p class="note">※ひらがなで記載してください</p>
+      <p class="solved-label" id="solved-q3">未完了</p>
+    </section>
+
+    <section class="question-box box" id="question4Box">
+      <h2 class="section-title section-title-blue">究極魔法</h2>
+
+      <div class="question-image-wrap">
+        <img
+          src="../assets/images/maleficent_q4.png"
+          alt="question 4"
+          class="question-image"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <div class="question-placeholder">ここに問4の問題画像を配置</div>
+      </div>
+
+      <div class="answer-row">
+        <input
+          id="input-q4"
+          type="text"
+          maxlength="10"
+          class="answer-input"
+          placeholder="ここに回答"
+          autocomplete="off"
+          disabled
+        />
+        <button type="button" class="answer-button" data-question="q4" disabled>回答する</button>
+      </div>
+
+      <p class="note">※ひらがなで記載してください</p>
+      <p class="solved-label locked" id="solved-q4">問1〜3を全て解くと解放されます</p>
+    </section>
+  </main>
+
+  <div id="effectOverlay" class="effect-overlay hidden">
+    <div class="effect-mask"></div>
+
+    <div class="effect-content">
+      <div id="girlStage" class="girl-stage hidden">
+        <div class="girl-mask"></div>
+
+        <img
+          id="sayaImage"
+          class="saya-image"
+          src="../assets/images/saya_magic.png"
+          alt="魔法少女サヤ"
+        />
+
+        <div id="dialogWindow" class="dialog-window hidden">
+          <p id="dialogText" class="dialog-text"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
