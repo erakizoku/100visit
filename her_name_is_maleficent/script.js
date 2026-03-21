@@ -79,14 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  async function showInitialStory() {
-    await runDialogueSequence([
-      "ここが管理者のいる場所……。",
-      "ようやくたどり着いたね！",
-      "あの管理者……マレフィセントを倒せば、きっと私の願いに近づけるはず！",
-      "謎の答えが魔法になるの。力を貸して！"
-    ]);
-  }
+async function showInitialStory() {
+  state.isBusy = true;
+
+  await runDialogueSequence([
+    "ここが管理者のいる場所……。",
+    "ようやくたどり着いたね！",
+    "あの管理者……マレフィセントを倒せば、きっと私の願いに近づけるはず！",
+    "謎の答えが魔法になるの。力を貸して！"
+  ]);
+
+  hideDialogueOverlay();
+  state.isBusy = false;
+}
 
   async function handleAnswer(questionKey) {
     if (state.isBusy) return;
