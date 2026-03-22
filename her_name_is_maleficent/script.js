@@ -57,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   mainPage.classList.add("page-breath");
   updateStatus();
-
   showInitialStory();
 
   answerButtons.forEach((button) => {
@@ -79,19 +78,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-async function showInitialStory() {
-  state.isBusy = true;
+  async function showInitialStory() {
+    state.isBusy = true;
 
-  await runDialogueSequence([
-    "ここが管理者のいる場所……。",
-    "ようやくたどり着いたね！",
-    "あの管理者……マレフィセントを倒せば、きっと私の願いに近づけるはず！",
-    "謎の答えが魔法になるの。力を貸して！"
-  ]);
+    await runDialogueSequence([
+      "ここが管理者のいる場所……。",
+      "ようやくたどり着いたね！",
+      "あの管理者……マレフィセントを倒せば、きっと私の願いに近づけるはず！",
+      "謎の答えが魔法になるの。力を貸して！"
+    ]);
 
-  hideDialogueOverlay();
-  state.isBusy = false;
-}
+    state.isBusy = false;
+  }
 
   async function handleAnswer(questionKey) {
     if (state.isBusy) return;
@@ -103,13 +101,16 @@ async function showInitialStory() {
     const input = document.getElementById(`input-${questionKey}`);
     const button = document.querySelector(`[data-question="${questionKey}"]`);
     const solvedLabel = document.getElementById(`solved-${questionKey}`);
-    const box = document.querySelector(`[data-question="${questionKey}"]`).closest(".question-box");
+    const box = button.closest(".question-box");
 
-    const userInput = normalizeAnswer(input.value);
+    const rawInput = input.value.trim();
+    const userInput = normalizeAnswer(rawInput);
     const correctAnswer = normalizeAnswer(question.answer);
 
     if (!userInput) {
+      state.isBusy = true;
       await runDialogueSequence(["答えを入力してみて！"]);
+      state.isBusy = false;
       return;
     }
 
@@ -121,7 +122,7 @@ async function showInitialStory() {
       if (userInput !== correctAnswer) {
         if (questionKey === "q4") {
           await runDialogueSequence([
-            `${input.value.trim()}`,
+            `${rawInput}`,
             "あれ！？うんともスンともだね…"
           ]);
         } else {
@@ -145,7 +146,7 @@ async function showInitialStory() {
 
       if (questionKey === "q1" || questionKey === "q2" || questionKey === "q3") {
         await runDialogueSequence([
-          `くらえ！\n${input.value.trim()}！！`
+          `くらえ！\n${rawInput}！！`
         ]);
 
         await playAttackEffect(question.attribute);
@@ -188,7 +189,8 @@ async function showInitialStory() {
           "お願い！私を救って！"
         ]);
 
-        hideDialogueOverlay();
+        state.isBusy = false;
+        return;
       }
 
       updateStatus();
@@ -198,6 +200,7 @@ async function showInitialStory() {
       input.disabled = false;
     }
 
+    updateStatus();
     state.isBusy = false;
   }
 
@@ -279,15 +282,24 @@ async function showInitialStory() {
     ring.remove();
   }
 
-  async function runDialogueSequence(lines) {
+  async function runDialogueSequence(lines, options = {}) {
+    const { keepOpen = false } = options;
+
     showDialogueOverlay();
 
     for (const line of lines) {
       await typeText(line);
     }
+
+    if (!keepOpen) {
+      hideDialogueOverlay();
+    }
   }
 
   function showDialogueOverlay() {
+    clearTimeout(typingTimer);
+    clearSceneHandlers();
+
     effectOverlay.classList.remove("hidden");
     girlStage.classList.remove("hidden");
     dialogWindow.classList.remove("hidden");
@@ -307,6 +319,8 @@ async function showInitialStory() {
     effectOverlay.classList.add("hidden");
     dialogText.textContent = "";
     isTyping = false;
+    fullText = "";
+    displayedText = "";
   }
 
   function typeText(text) {
