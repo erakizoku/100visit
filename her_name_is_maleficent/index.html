@@ -9,7 +9,7 @@
 <body>
   <main class="page" id="mainPage">
     <section class="boss-visual box">
-      <div class="boss-visual-stage" id="bossVisualStage">
+      <div class="boss-visual-stage">
         <div class="battle-bg"></div>
 
         <img
@@ -19,7 +19,6 @@
           alt="マレフィセント"
         />
 
-        <div id="effectLayer" class="effect-layer" aria-hidden="true"></div>
         <div id="flashLayer" class="flash-layer" aria-hidden="true"></div>
       </div>
 
@@ -41,13 +40,13 @@
       </p>
     </section>
 
-    <section class="question-box box">
+    <section class="question-box box" id="questionBox1">
       <h2 class="section-title section-title-blue">魔法の解読 1</h2>
 
-      <div class="question-image-wrap">
+      <div class="question-frame">
         <img
           src="../assets/images/maleficent_q1.png"
-          alt="question 1"
+          alt="問1"
           class="question-image"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
         />
@@ -70,13 +69,13 @@
       <p class="solved-label" id="solved-q1">未完了</p>
     </section>
 
-    <section class="question-box box">
+    <section class="question-box box" id="questionBox2">
       <h2 class="section-title section-title-blue">魔法の解読 2</h2>
 
-      <div class="question-image-wrap">
+      <div class="question-frame">
         <img
           src="../assets/images/maleficent_q2.png"
-          alt="question 2"
+          alt="問2"
           class="question-image"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
         />
@@ -99,13 +98,13 @@
       <p class="solved-label" id="solved-q2">未完了</p>
     </section>
 
-    <section class="question-box box">
+    <section class="question-box box" id="questionBox3">
       <h2 class="section-title section-title-blue">魔法の解読 3</h2>
 
-      <div class="question-image-wrap">
+      <div class="question-frame">
         <img
           src="../assets/images/maleficent_q3.png"
-          alt="question 3"
+          alt="問3"
           class="question-image"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
         />
@@ -128,13 +127,13 @@
       <p class="solved-label" id="solved-q3">未完了</p>
     </section>
 
-    <section class="question-box box" id="question4Box">
+    <section class="question-box box" id="questionBox4">
       <h2 class="section-title section-title-blue">究極魔法</h2>
 
-      <div class="question-image-wrap">
+      <div class="question-frame">
         <img
           src="../assets/images/maleficent_q4.png"
-          alt="question 4"
+          alt="問4"
           class="question-image"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
         />
@@ -145,7 +144,7 @@
         <input
           id="input-q4"
           type="text"
-          maxlength="10"
+          maxlength="20"
           class="answer-input"
           placeholder="ここに回答"
           autocomplete="off"
@@ -164,13 +163,11 @@
 
     <div class="effect-content">
       <div id="girlStage" class="girl-stage hidden">
-        <div class="girl-mask"></div>
-
         <img
           id="sayaImage"
           class="saya-image"
           src="../assets/images/saya_magic.png"
-          alt="魔法少女サヤ"
+          alt="サヤ"
         />
 
         <div id="dialogWindow" class="dialog-window hidden">
@@ -186,6 +183,10 @@
           alt="マレフィセント"
         />
         <div id="bossMagicEffect" class="boss-magic-effect hidden"></div>
+
+        <div id="bossDialogWindow" class="dialog-window hidden boss-dialog-window">
+          <p id="bossDialogText" class="dialog-text"></p>
+        </div>
       </div>
     </div>
   </div>
