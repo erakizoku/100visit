@@ -7,12 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const state = {
-    solved: {
-      q1: false,
-      q2: false,
-      q3: false,
-      q4: false
-    },
+    solved: { q1: false, q2: false, q3: false, q4: false },
     phase: 1,
     isBusy: false,
     hp: 100,
@@ -31,12 +26,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const sayaImage = document.getElementById("sayaImage");
   const dialogWindow = document.getElementById("dialogWindow");
   const dialogText = document.getElementById("dialogText");
+  const choiceWindow = document.getElementById("choiceWindow");
+  const choiceButton = document.getElementById("choiceButton");
 
   const bossOverlayStage = document.getElementById("bossOverlayStage");
   const bossOverlayImage = document.getElementById("bossOverlayImage");
   const bossMagicEffect = document.getElementById("bossMagicEffect");
   const bossDialogWindow = document.getElementById("bossDialogWindow");
   const bossDialogText = document.getElementById("bossDialogText");
+  const overlayHpBox = document.getElementById("overlayHpBox");
+  const overlayHpFill = document.getElementById("overlayHpFill");
+  const overlayHpValue = document.getElementById("overlayHpValue");
+  const overlayHpName = document.getElementById("overlayHpName");
 
   const q4Input = document.getElementById("input-q4");
   const q4Button = document.querySelector('[data-question="q4"]');
@@ -48,18 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let typingTimer = null;
   let typingSkipHandler = null;
   let advanceHandler = null;
-  let currentTypeTarget = null;
   let isTyping = false;
   let fullText = "";
   let displayedText = "";
 
   updateStatus();
-  showInitialStory();
+  showOpeningSequence();
 
   answerButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const questionKey = button.dataset.question;
-      handleAnswer(questionKey);
+      handleAnswer(button.dataset.question);
     });
   });
 
@@ -75,14 +74,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  async function showInitialStory() {
+  async function showOpeningSequence() {
     state.isBusy = true;
 
+    setSayaSprite("../assets/images/saya_standing.png");
+
     await runSayaDialogue([
-      "ここが管理者のいる場所……。",
-      "ようやくたどり着いたね！",
-      "あの管理者……マレフィセントを倒せば、きっと私の願いに近づけるはず！",
-      "謎の答えが魔法になるの！力を貸して！"
+      "管理者の正体まで考えてくれてありがとう！",
+      "わたしの病気って「眠れる森の美女」のオーロラ姫みたいだから\n正体はマレフィセントってことにしたんだよ！",
+      "ちょっと難しいかなって思ったけど、本当にすごいね！",
+      "せっかくだからさもう少しわたしのゲームに付き合ってよ。"
+    ], { keepMask: true });
+
+    await whiteoutTransformSaya();
+
+    await runChoice("その姿は？");
+
+    await runSayaDialogue([
+      "えへへ、ちょっと魔法少女に憧れててね。",
+      "ここからは管理者ＶＳ魔法少女って設定だからよろしく！",
+      "あれがマレフィセントの正体！？"
+    ]);
+
+    await runBossDialogue([
+      "ついにここまでたどり着いたか。\nちょうど退屈していたところだ、少し遊んでやろう"
+    ]);
+
+    await runSayaDialogue([
+      "マレフィセントを倒せば。きっとわたしの願いに近づけるはず！",
+      "あなたの力を貸して！謎を解いて封じられた魔法を解放してほしい！"
     ]);
 
     state.isBusy = false;
@@ -119,16 +139,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (questionKey === "q1" || questionKey === "q2" || questionKey === "q3") {
         await runSayaDialogue([`くらえ！\n${rawInput}！！`], { keepMask: true });
 
-        hideSayaDialogOnly();
-        await playBossMagicSequence(question.attribute);
-
         if (userInput !== correctAnswer) {
-          await runBossDialogue(["あれ！？魔法がでない！"]);
+          await runBossDialogue(["ふっ不発のようだな"]);
+          await runSayaDialogue(["あれ、魔法が出ない…もう一度謎と解いてみて！"]);
           button.disabled = false;
           input.disabled = false;
           state.isBusy = false;
           return;
         }
+
+        hideSayaDialogOnly();
+        await playBossMagicSequence(question.attribute);
+
+        const isLastOfThree =
+          !state.solved[questionKey] &&
+          [questionKey === "q1" ? true : state.solved.q1,
+           questionKey === "q2" ? true : state.solved.q2,
+           questionKey === "q3" ? true : state.solved.q3].every(Boolean);
 
         state.solved[questionKey] = true;
         solvedLabel.textContent = "完了";
@@ -137,25 +164,31 @@ document.addEventListener("DOMContentLoaded", () => {
         box.classList.add("solved");
         button.textContent = "完了";
 
-        damageBoss(question.damage);
+        if (questionKey === "q1") {
+          await animateBossHpTo(70);
+        } else if (questionKey === "q2") {
+          await animateBossHpTo(40);
+        } else if (questionKey === "q3") {
+          await animateBossHpTo(1);
+        }
 
-        const allFirstThreeSolved =
-          state.solved.q1 && state.solved.q2 && state.solved.q3;
-
-        if (allFirstThreeSolved && state.phase === 1) {
-          await runBossDialogue(["ここまでやるとは…そろそろ本気を出すとするか！"]);
+        if (state.solved.q1 && state.solved.q2 && state.solved.q3 && state.phase === 1) {
+          await runBossDialogue(["ここまでやるとは…そろそろ本気を出すとするか"], { keepOverlayHp: true });
 
           hideBossOverlayOnly();
           await transformBossToDragon();
 
+          await runBossDialogue(["ギャオーーーーン"]);
+
+          setSayaSprite("../assets/images/saya_magic.png");
           await runSayaDialogue([
-            "クッ…すごい魔力！",
-            "でも、私の究極魔法なら倒せるはず！"
+            "くっすごい魔力…",
+            "でも、わたしの究極魔法ならきっと倒せるはず…"
           ]);
 
           unlockQuestion4();
         } else {
-          await runBossDialogue(["ぐわ！なかなか聞いたぞ！"]);
+          await runBossDialogue(["ぐわ！なかなか聞いたぞ！"], { keepOverlayHp: true });
         }
 
         updateStatus();
@@ -190,12 +223,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         hideSayaDialogOnly();
         await playBossMagicSequence(question.attribute);
-
-        damageBoss(question.damage);
+        await animateBossHpTo(0);
 
         await runBossDialogue([
           "ぐわーーーーーー！…う、自惚れるなよ…私は…三竜王のなかでも最弱…お前の寿命が少し伸びただけのこと"
-        ]);
+        ], { keepOverlayHp: true });
 
         await runSayaDialogue([
           "やったー倒せたね！おめでとう！",
@@ -218,6 +250,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function runChoice(label) {
+    showSayaOverlay();
+    choiceButton.textContent = label;
+    choiceWindow.classList.remove("hidden");
+
+    await new Promise((resolve) => {
+      const handler = (event) => {
+        event.stopPropagation();
+        choiceButton.removeEventListener("click", handler);
+        choiceWindow.classList.add("hidden");
+        resolve();
+      };
+      choiceButton.addEventListener("click", handler);
+    });
+  }
+
+  async function whiteoutTransformSaya() {
+    flashLayer.classList.add("active");
+    effectOverlay.classList.remove("hidden");
+    girlStage.classList.remove("hidden");
+
+    await wait(260);
+    setSayaSprite("../assets/images/saya_magic.png");
+    sayaImage.classList.add("visible");
+    await wait(420);
+
+    flashLayer.classList.remove("active");
+    hideOverlayAll();
+  }
+
+  function setSayaSprite(src) {
+    sayaImage.src = src;
+  }
+
   function unlockQuestion4() {
     q4Input.disabled = false;
     q4Button.disabled = false;
@@ -225,32 +291,64 @@ document.addEventListener("DOMContentLoaded", () => {
     q4SolvedLabel.classList.remove("locked");
   }
 
-  function damageBoss(amount) {
-    state.hp = Math.max(0, state.hp - amount);
-    updateStatus();
-  }
-
-  function resetBossHp() {
-    state.hp = state.maxHp;
-    updateStatus();
-  }
-
   async function transformBossToDragon() {
-    state.phase = 2;
-    resetBossHp();
-
     flashLayer.classList.add("active");
-    await wait(180);
+    await wait(220);
 
+    state.phase = 2;
     bossImage.src = "../assets/images/maleficent_dragon.png";
     bossImage.alt = "マレフィセント（ドラゴン）";
     bossImage.classList.add("dragon-form");
     bossImage.classList.add("dragon-appear");
 
-    await wait(700);
+    showBossOverlayOnly();
+    bossOverlayImage.src = "../assets/images/maleficent_dragon.png";
+    bossOverlayImage.alt = "マレフィセント（ドラゴン）";
+    bossOverlayImage.classList.add("dragon-form");
 
+    state.hp = 100;
+    updateStatus();
+    syncOverlayHp();
+
+    await animateOverlayHpInstant(100);
+
+    await wait(600);
     bossImage.classList.remove("dragon-appear");
     flashLayer.classList.remove("active");
+  }
+
+  async function animateBossHpTo(targetHp) {
+    showOverlayHp();
+    const start = state.hp;
+    const end = targetHp;
+    const steps = Math.max(1, Math.abs(start - end));
+    const direction = end < start ? -1 : 1;
+
+    for (let i = 0; i < steps; i += 1) {
+      state.hp += direction;
+      updateStatus();
+      syncOverlayHp();
+      await wait(14);
+    }
+
+    state.hp = targetHp;
+    updateStatus();
+    syncOverlayHp();
+  }
+
+  async function animateOverlayHpInstant(targetHp) {
+    const start = parseInt(overlayHpValue.dataset.hp || "1", 10) || 1;
+    const steps = Math.max(1, Math.abs(start - targetHp));
+    const direction = targetHp < start ? -1 : 1;
+    let current = start;
+
+    for (let i = 0; i < steps; i += 1) {
+      current += direction;
+      setOverlayHpVisual(current);
+      await wait(10);
+    }
+
+    setOverlayHpVisual(targetHp);
   }
 
   function updateStatus() {
@@ -259,6 +357,28 @@ document.addEventListener("DOMContentLoaded", () => {
     hpValue.textContent = `HP ${state.hp} / ${state.maxHp}`;
     hpName.textContent =
       state.phase === 1 ? "マレフィセント" : "マレフィセント（ドラゴン）";
+  }
+
+  function showOverlayHp() {
+    overlayHpBox.classList.remove("hidden");
+    syncOverlayHp();
+  }
+
+  function hideOverlayHp() {
+    overlayHpBox.classList.add("hidden");
+  }
+
+  function syncOverlayHp() {
+    overlayHpName.textContent =
+      state.phase === 1 ? "マレフィセント" : "マレフィセント（ドラゴン）";
+    setOverlayHpVisual(state.hp);
+  }
+
+  function setOverlayHpVisual(hp) {
+    const hpPercent = Math.max(0, Math.min(100, (hp / state.maxHp) * 100));
+    overlayHpFill.style.width = `${hpPercent}%`;
+    overlayHpValue.textContent = `HP ${hp} / ${state.maxHp}`;
+    overlayHpValue.dataset.hp = String(hp);
   }
 
   async function playBossMagicSequence(attribute) {
@@ -282,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showSayaOverlay();
 
     for (const line of lines) {
-      await typeText(line, dialogText, "saya");
+      await typeText(line, dialogText);
     }
 
     if (!keepMask) {
@@ -290,12 +410,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function runBossDialogue(lines) {
+  async function runBossDialogue(lines, options = {}) {
+    const { keepOverlayHp = false } = options;
+
     showBossOverlayOnly();
     showBossDialogWindow();
 
+    if (keepOverlayHp) {
+      showOverlayHp();
+    }
+
     for (const line of lines) {
-      await typeText(line, bossDialogText, "boss");
+      await typeText(line, bossDialogText);
     }
 
     hideOverlayAll();
@@ -308,6 +434,8 @@ document.addEventListener("DOMContentLoaded", () => {
     dialogWindow.classList.remove("hidden");
     bossOverlayStage.classList.add("hidden");
     bossDialogWindow.classList.add("hidden");
+    choiceWindow.classList.add("hidden");
+    hideOverlayHp();
 
     requestAnimationFrame(() => {
       sayaImage.classList.add("visible");
@@ -318,6 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTyping();
     sayaImage.classList.remove("visible");
     dialogWindow.classList.add("hidden");
+    choiceWindow.classList.add("hidden");
     dialogText.textContent = "";
   }
 
@@ -326,6 +455,8 @@ document.addEventListener("DOMContentLoaded", () => {
     effectOverlay.classList.remove("hidden");
     girlStage.classList.add("hidden");
     dialogWindow.classList.add("hidden");
+    choiceWindow.classList.add("hidden");
+
     bossOverlayStage.classList.remove("hidden");
     bossOverlayImage.classList.remove("hidden");
     bossDialogWindow.classList.add("hidden");
@@ -354,6 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bossOverlayImage.classList.add("hidden");
     bossOverlayStage.classList.add("hidden");
     bossDialogText.textContent = "";
+    hideOverlayHp();
   }
 
   function hideOverlayAll() {
@@ -362,6 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sayaImage.classList.remove("visible");
     dialogWindow.classList.add("hidden");
     bossDialogWindow.classList.add("hidden");
+    choiceWindow.classList.add("hidden");
 
     girlStage.classList.add("hidden");
     bossOverlayStage.classList.add("hidden");
@@ -369,16 +502,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     dialogText.textContent = "";
     bossDialogText.textContent = "";
+    hideOverlayHp();
   }
 
-  function typeText(text, targetEl, mode) {
+  function typeText(text, targetEl) {
     return new Promise((resolve) => {
       clearTyping();
 
       fullText = text;
       displayedText = "";
       targetEl.textContent = "";
-      currentTypeTarget = targetEl;
       isTyping = true;
 
       let index = 0;
@@ -443,7 +576,6 @@ document.addEventListener("DOMContentLoaded", () => {
     isTyping = false;
     fullText = "";
     displayedText = "";
-    currentTypeTarget = null;
   }
 
   function normalizeAnswer(text) {
