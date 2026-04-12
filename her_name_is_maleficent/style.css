@@ -283,8 +283,6 @@ input {
   display: none !important;
 }
 
-/* オーバーレイ会話 */
-
 .effect-overlay {
   position: fixed;
   inset: 0;
@@ -353,7 +351,29 @@ input {
   overflow-wrap: break-word;
 }
 
-/* 敵演出 */
+.choice-window {
+  position: absolute;
+  left: 50%;
+  bottom: 210px;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+  max-width: 320px;
+  z-index: 5;
+}
+
+.choice-button {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #cfdcf2;
+  background: rgba(255, 255, 255, 0.96);
+  color: #223;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.choice-button:hover {
+  background: #f5f9ff;
+}
 
 .boss-overlay-stage {
   position: absolute;
@@ -365,16 +385,16 @@ input {
 .boss-overlay-image {
   position: absolute;
   left: 50%;
-  top: 44%;
+  top: 40%;
   transform: translate(-50%, -50%);
   width: min(78vw, 340px);
-  max-height: 54vh;
+  max-height: 50vh;
   object-fit: contain;
 }
 
 .boss-overlay-image.dragon-form {
   width: min(88vw, 390px);
-  max-height: 56vh;
+  max-height: 54vh;
 }
 
 .boss-dialog-window {
@@ -384,7 +404,7 @@ input {
 .boss-magic-effect {
   position: absolute;
   left: 50%;
-  top: 44%;
+  top: 40%;
   transform: translate(-50%, -50%);
   width: 100px;
   height: 100px;
@@ -410,6 +430,43 @@ input {
   animation: bossMagicBurst 0.82s ease-out forwards;
 }
 
+.overlay-hp-box {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 420px;
+  padding: 10px 12px;
+  background: rgba(20, 24, 35, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  z-index: 5;
+}
+
+.overlay-hp-label-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.overlay-hp-track {
+  width: 100%;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.overlay-hp-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, #69d36e 0%, #b9d84e 45%, #df8b52 75%, #cf4c4c 100%);
+  transition: width 0.7s ease;
+}
+
 .boss-hit {
   animation: bossHitShake 0.38s ease;
 }
@@ -417,8 +474,6 @@ input {
 .dragon-appear {
   animation: dragonAppear 0.65s ease;
 }
-
-/* アニメーション */
 
 @keyframes screenFlash {
   0% { opacity: 0; }
@@ -491,5 +546,9 @@ input {
 
   .dialog-text {
     font-size: 15px;
+  }
+
+  .choice-window {
+    bottom: 198px;
   }
 }
