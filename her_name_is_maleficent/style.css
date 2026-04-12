@@ -128,6 +128,10 @@ input {
   animation: screenFlash 0.55s ease;
 }
 
+.flash-layer.strong {
+  animation: strongWhiteFlash 0.95s ease;
+}
+
 .hp-status {
   padding: 12px;
   border-top: 1px solid var(--line-soft);
@@ -315,11 +319,58 @@ input {
   max-height: 58vh;
   object-fit: contain;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.35s ease, transform 0.25s ease;
 }
 
 .saya-image.visible {
   opacity: 1;
+}
+
+.saya-image.transform-reveal {
+  transform: translateX(-50%) scale(1.08);
+}
+
+.saya-aura {
+  position: absolute;
+  left: 50%;
+  bottom: 220px;
+  transform: translateX(-50%);
+  width: min(68vw, 260px);
+  height: min(68vw, 260px);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(170, 220, 255, 0.85) 0%, rgba(120, 190, 255, 0.4) 35%, rgba(120, 190, 255, 0.05) 70%, transparent 100%);
+  filter: blur(6px);
+  z-index: 1;
+}
+
+.saya-aura.active {
+  animation: auraPulse 0.32s ease-in-out 2 alternate;
+}
+
+.particle-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle-layer.active::before,
+.particle-layer.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 220px;
+  height: 220px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 40%, rgba(190,230,255,0.7) 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 30%, rgba(210,240,255,0.65) 0 2px, transparent 3px),
+    radial-gradient(circle at 62% 72%, rgba(255,255,255,0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 20% 70%, rgba(180,220,255,0.55) 0 2px, transparent 3px);
+  animation: sparkleFloat 0.9s ease-out forwards;
 }
 
 .dialog-window {
@@ -382,6 +433,23 @@ input {
   pointer-events: none;
 }
 
+.boss-dark-aura {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: min(84vw, 340px);
+  height: min(84vw, 340px);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(120, 80, 180, 0.25) 0%, rgba(60, 30, 90, 0.3) 35%, rgba(20, 10, 30, 0.05) 75%, transparent 100%);
+  filter: blur(10px);
+  z-index: 1;
+}
+
+.boss-dark-aura.active {
+  animation: darkAuraPulse 0.3s ease-in-out 2 alternate;
+}
+
 .boss-overlay-image {
   position: absolute;
   left: 50%;
@@ -390,11 +458,16 @@ input {
   width: min(78vw, 340px);
   max-height: 50vh;
   object-fit: contain;
+  z-index: 2;
 }
 
 .boss-overlay-image.dragon-form {
   width: min(88vw, 390px);
   max-height: 54vh;
+}
+
+.boss-overlay-image.transform-reveal {
+  animation: dragonReveal 0.35s ease-out forwards;
 }
 
 .boss-dialog-window {
@@ -410,6 +483,7 @@ input {
   height: 100px;
   border-radius: 999px;
   opacity: 0;
+  z-index: 3;
 }
 
 .boss-magic-effect.fire {
@@ -475,10 +549,41 @@ input {
   animation: dragonAppear 0.65s ease;
 }
 
+.animation-blocker {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: transparent;
+  pointer-events: auto;
+}
+
 @keyframes screenFlash {
   0% { opacity: 0; }
   20% { opacity: 0.82; }
   100% { opacity: 0; }
+}
+
+@keyframes strongWhiteFlash {
+  0% { opacity: 0; }
+  18% { opacity: 0.35; }
+  42% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes auraPulse {
+  0% { opacity: 0.2; transform: translateX(-50%) scale(0.92); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+}
+
+@keyframes darkAuraPulse {
+  0% { opacity: 0.15; transform: translate(-50%, -50%) scale(0.94); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@keyframes sparkleFloat {
+  0% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.85); }
+  100% { opacity: 0; transform: translate(-50%, -54%) scale(1.18); }
 }
 
 @keyframes bossMagicBurst {
@@ -513,6 +618,19 @@ input {
   100% {
     opacity: 1;
     transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes dragonReveal {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.1);
+    filter: brightness(1.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
     filter: brightness(1);
   }
 }
