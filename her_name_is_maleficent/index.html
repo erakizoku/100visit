@@ -166,12 +166,16 @@
         <img
           id="sayaImage"
           class="saya-image"
-          src="../assets/images/saya_magic.png"
+          src="../assets/images/saya_standing.png"
           alt="サヤ"
         />
 
         <div id="dialogWindow" class="dialog-window hidden">
           <p id="dialogText" class="dialog-text"></p>
+        </div>
+
+        <div id="choiceWindow" class="choice-window hidden">
+          <button id="choiceButton" class="choice-button" type="button">その姿は？</button>
         </div>
       </div>
 
@@ -186,6 +190,16 @@
 
         <div id="bossDialogWindow" class="dialog-window hidden boss-dialog-window">
           <p id="bossDialogText" class="dialog-text"></p>
+        </div>
+
+        <div id="overlayHpBox" class="overlay-hp-box hidden">
+          <div class="overlay-hp-label-row">
+            <span id="overlayHpName">マレフィセント</span>
+            <span id="overlayHpValue">HP 100 / 100</span>
+          </div>
+          <div class="overlay-hp-track">
+            <div id="overlayHpFill" class="overlay-hp-fill"></div>
+          </div>
         </div>
       </div>
     </div>
