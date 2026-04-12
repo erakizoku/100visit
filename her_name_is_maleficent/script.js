@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     solved: { q1: false, q2: false, q3: false, q4: false },
     phase: 1,
     isBusy: false,
+    isAnimating: false,
     hp: 100,
     maxHp: 100
   };
@@ -28,6 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const dialogText = document.getElementById("dialogText");
   const choiceWindow = document.getElementById("choiceWindow");
   const choiceButton = document.getElementById("choiceButton");
+  const sayaAura = document.getElementById("sayaAura");
+  const particleLayer = document.getElementById("particleLayer");
 
   const bossOverlayStage = document.getElementById("bossOverlayStage");
   const bossOverlayImage = document.getElementById("bossOverlayImage");
@@ -38,6 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const overlayHpFill = document.getElementById("overlayHpFill");
   const overlayHpValue = document.getElementById("overlayHpValue");
   const overlayHpName = document.getElementById("overlayHpName");
+  const bossDarkAura = document.getElementById("bossDarkAura");
+
+  const animationBlocker = document.getElementById("animationBlocker");
 
   const q4Input = document.getElementById("input-q4");
   const q4Button = document.querySelector('[data-question="q4"]');
@@ -86,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "せっかくだからさもう少しわたしのゲームに付き合ってよ。"
     ], { keepMask: true });
 
-    await whiteoutTransformSaya();
+    await playSayaTransformation();
 
     await runChoice("その姿は？");
 
@@ -109,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function handleAnswer(questionKey) {
-    if (state.isBusy) return;
+    if (state.isBusy || state.isAnimating) return;
     if (state.solved[questionKey]) return;
 
     const question = QUESTIONS[questionKey];
@@ -151,12 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
         hideSayaDialogOnly();
         await playBossMagicSequence(question.attribute);
 
-        const isLastOfThree =
-          !state.solved[questionKey] &&
-          [questionKey === "q1" ? true : state.solved.q1,
-           questionKey === "q2" ? true : state.solved.q2,
-           questionKey === "q3" ? true : state.solved.q3].every(Boolean);
-
         state.solved[questionKey] = true;
         solvedLabel.textContent = "完了";
         solvedLabel.classList.remove("locked");
@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
           await runBossDialogue(["ここまでやるとは…そろそろ本気を出すとするか"], { keepOverlayHp: true });
 
           hideBossOverlayOnly();
-          await transformBossToDragon();
+          await playBossTransformation();
 
           await runBossDialogue(["ギャオーーーーン"]);
 
@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ], { keepMask: true });
 
         hideSayaDialogOnly();
-        await playBossMagicSequence(question.attribute);
+        await playUltimateBossMagicSequence(question.attribute);
         await animateBossHpTo(0);
 
         await runBossDialogue([
@@ -247,6 +247,8 @@ document.addEventListener("DOMContentLoaded", () => {
       button.disabled = false;
       input.disabled = false;
       state.isBusy = false;
+      state.isAnimating = false;
+      unlockAnimation();
     }
   }
 
@@ -257,6 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     await new Promise((resolve) => {
       const handler = (event) => {
+        if (state.isAnimating) return;
         event.stopPropagation();
         choiceButton.removeEventListener("click", handler);
         choiceWindow.classList.add("hidden");
@@ -266,22 +269,147 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  async function whiteoutTransformSaya() {
-    flashLayer.classList.add("active");
+  async function playSayaTransformation() {
+    state.isAnimating = true;
+    lockAnimation();
+
     effectOverlay.classList.remove("hidden");
     girlStage.classList.remove("hidden");
+    dialogWindow.classList.add("hidden");
+    choiceWindow.classList.add("hidden");
+    bossOverlayStage.classList.add("hidden");
 
-    await wait(260);
-    setSayaSprite("../assets/images/saya_magic.png");
     sayaImage.classList.add("visible");
-    await wait(420);
+    sayaAura.classList.remove("hidden");
+    particleLayer.classList.remove("hidden");
 
-    flashLayer.classList.remove("active");
+    await wait(80);
+
+    sayaAura.classList.add("active");
+    particleLayer.classList.add("active");
+    await wait(280);
+
+    flashLayer.classList.add("strong");
+    await wait(260);
+
+    setSayaSprite("../assets/images/saya_magic.png");
+    sayaImage.classList.add("transform-reveal");
+    await wait(360);
+
+    flashLayer.classList.remove("strong");
+    particleLayer.classList.remove("active");
+    sayaAura.classList.remove("active");
+    await wait(260);
+
+    sayaImage.classList.remove("transform-reveal");
+    particleLayer.classList.add("hidden");
+    sayaAura.classList.add("hidden");
+
     hideOverlayAll();
+
+    unlockAnimation();
+    state.isAnimating = false;
   }
 
-  function setSayaSprite(src) {
-    sayaImage.src = src;
+  async function playBossTransformation() {
+    state.isAnimating = true;
+    lockAnimation();
+
+    effectOverlay.classList.remove("hidden");
+    bossOverlayStage.classList.remove("hidden");
+    bossOverlayImage.classList.remove("hidden");
+    showOverlayHp();
+
+    bossDarkAura.classList.remove("hidden");
+    bossDarkAura.classList.add("active");
+
+    await wait(220);
+
+    flashLayer.classList.add("strong");
+    await wait(260);
+
+    state.phase = 2;
+    state.hp = 1;
+    bossImage.src = "../assets/images/maleficent_dragon.png";
+    bossImage.alt = "マレフィセント（ドラゴン）";
+    bossImage.classList.add("dragon-form");
+
+    bossOverlayImage.src = "../assets/images/maleficent_dragon.png";
+    bossOverlayImage.alt = "マレフィセント（ドラゴン）";
+    bossOverlayImage.classList.add("dragon-form");
+    bossOverlayImage.classList.add("transform-reveal");
+
+    await wait(220);
+
+    state.hp = 100;
+    updateStatus();
+    overlayHpName.textContent = "マレフィセント（ドラゴン）";
+    await animateOverlayHpOnly(1, 100);
+
+    await wait(260);
+
+    flashLayer.classList.remove("strong");
+    bossDarkAura.classList.remove("active");
+    bossDarkAura.classList.add("hidden");
+    bossOverlayImage.classList.remove("transform-reveal");
+
+    hideBossOverlayOnly();
+
+    unlockAnimation();
+    state.isAnimating = false;
+  }
+
+  async function playBossMagicSequence(attribute) {
+    showBossOverlayOnly();
+
+    bossMagicEffect.className = `boss-magic-effect ${attribute}`;
+    bossMagicEffect.classList.remove("hidden");
+
+    await wait(420);
+
+    bossOverlayImage.classList.add("boss-hit");
+    await wait(420);
+
+    bossOverlayImage.classList.remove("boss-hit");
+    bossMagicEffect.className = "boss-magic-effect hidden";
+  }
+
+  async function playUltimateBossMagicSequence(attribute) {
+    state.isAnimating = true;
+    lockAnimation();
+
+    showBossOverlayOnly();
+
+    bossMagicEffect.className = `boss-magic-effect ${attribute}`;
+    bossMagicEffect.classList.remove("hidden");
+    bossMagicEffect.style.width = "140px";
+    bossMagicEffect.style.height = "140px";
+
+    for (let i = 0; i < 3; i += 1) {
+      flashLayer.classList.add("active");
+      await wait(180);
+      flashLayer.classList.remove("active");
+      await wait(80);
+    }
+
+    bossOverlayImage.classList.add("boss-hit");
+    await wait(420);
+    bossOverlayImage.classList.remove("boss-hit");
+
+    bossMagicEffect.className = "boss-magic-effect hidden";
+    bossMagicEffect.style.width = "";
+    bossMagicEffect.style.height = "";
+
+    unlockAnimation();
+    state.isAnimating = false;
+  }
+
+  function lockAnimation() {
+    animationBlocker.classList.remove("hidden");
+  }
+
+  function unlockAnimation() {
+    animationBlocker.classList.add("hidden");
   }
 
   function unlockQuestion4() {
@@ -289,32 +417,6 @@ document.addEventListener("DOMContentLoaded", () => {
     q4Button.disabled = false;
     q4SolvedLabel.textContent = "解放済み";
     q4SolvedLabel.classList.remove("locked");
-  }
-
-  async function transformBossToDragon() {
-    flashLayer.classList.add("active");
-    await wait(220);
-
-    state.phase = 2;
-    bossImage.src = "../assets/images/maleficent_dragon.png";
-    bossImage.alt = "マレフィセント（ドラゴン）";
-    bossImage.classList.add("dragon-form");
-    bossImage.classList.add("dragon-appear");
-
-    showBossOverlayOnly();
-    bossOverlayImage.src = "../assets/images/maleficent_dragon.png";
-    bossOverlayImage.alt = "マレフィセント（ドラゴン）";
-    bossOverlayImage.classList.add("dragon-form");
-
-    state.hp = 100;
-    updateStatus();
-    syncOverlayHp();
-
-    await animateOverlayHpInstant(100);
-
-    await wait(600);
-    bossImage.classList.remove("dragon-appear");
-    flashLayer.classList.remove("active");
   }
 
   async function animateBossHpTo(targetHp) {
@@ -336,11 +438,12 @@ document.addEventListener("DOMContentLoaded", () => {
     syncOverlayHp();
   }
 
-  async function animateOverlayHpInstant(targetHp) {
-    const start = parseInt(overlayHpValue.dataset.hp || "1", 10) || 1;
-    const steps = Math.max(1, Math.abs(start - targetHp));
-    const direction = targetHp < start ? -1 : 1;
-    let current = start;
+  async function animateOverlayHpOnly(startHp, targetHp) {
+    let current = startHp;
+    setOverlayHpVisual(current);
+
+    const steps = Math.max(1, Math.abs(startHp - targetHp));
+    const direction = targetHp < startHp ? -1 : 1;
 
     for (let i = 0; i < steps; i += 1) {
       current += direction;
@@ -378,22 +481,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const hpPercent = Math.max(0, Math.min(100, (hp / state.maxHp) * 100));
     overlayHpFill.style.width = `${hpPercent}%`;
     overlayHpValue.textContent = `HP ${hp} / ${state.maxHp}`;
-    overlayHpValue.dataset.hp = String(hp);
-  }
-
-  async function playBossMagicSequence(attribute) {
-    showBossOverlayOnly();
-
-    bossMagicEffect.className = `boss-magic-effect ${attribute}`;
-    bossMagicEffect.classList.remove("hidden");
-
-    await wait(420);
-
-    bossOverlayImage.classList.add("boss-hit");
-    await wait(420);
-
-    bossOverlayImage.classList.remove("boss-hit");
-    bossMagicEffect.className = "boss-magic-effect hidden";
   }
 
   async function runSayaDialogue(lines, options = {}) {
@@ -503,6 +590,13 @@ document.addEventListener("DOMContentLoaded", () => {
     dialogText.textContent = "";
     bossDialogText.textContent = "";
     hideOverlayHp();
+
+    sayaAura.classList.remove("active");
+    sayaAura.classList.add("hidden");
+    particleLayer.classList.remove("active");
+    particleLayer.classList.add("hidden");
+    bossDarkAura.classList.remove("active");
+    bossDarkAura.classList.add("hidden");
   }
 
   function typeText(text, targetEl) {
@@ -526,7 +620,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         advanceHandler = () => {
-          if (isTyping) return;
+          if (isTyping || state.isAnimating) return;
           clearTypingHandlers();
           resolve();
         };
@@ -546,7 +640,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       typingSkipHandler = () => {
-        if (!isTyping) return;
+        if (!isTyping || state.isAnimating) return;
         clearTimeout(typingTimer);
         displayedText = fullText;
         targetEl.textContent = fullText;
@@ -576,6 +670,10 @@ document.addEventListener("DOMContentLoaded", () => {
     isTyping = false;
     fullText = "";
     displayedText = "";
+  }
+
+  function setSayaSprite(src) {
+    sayaImage.src = src;
   }
 
   function normalizeAnswer(text) {
